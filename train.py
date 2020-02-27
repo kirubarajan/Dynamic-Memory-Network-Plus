@@ -14,7 +14,7 @@ def train_net(args):
     torch.manual_seed(7)
     np.random.seed(7)
 
-    for run in range(10):
+    for run in range(1):
         for task_id in range(1, 21):
             dset = BabiDataset(task_id)
             vocab_size = len(dset.QA.VOCAB)
