@@ -82,10 +82,14 @@ class EpisodicMemory(nn.Module):
     def __init__(self, hidden_size):
         super(EpisodicMemory, self).__init__()
         self.AGRU = AttentionGRU(hidden_size, hidden_size)
-        self.z1 = nn.Linear(4 * hidden_size, hidden_size)
+        
+        self.z1 = nn.Linear(4 * hidden_size, 2 * hidden_size)
+        self.z1_ = nn.Linear(2 * hidden_size, hidden_size)
         self.z2 = nn.Linear(hidden_size, 1)
+        
         self.next_mem = nn.Linear(3 * hidden_size, hidden_size)
         init.xavier_normal_(self.z1.state_dict()['weight'])
+        init.xavier_normal_(self.z1_.state_dict()['weight'])
         init.xavier_normal_(self.z2.state_dict()['weight'])
         init.xavier_normal_(self.next_mem.state_dict()['weight'])
 
@@ -111,6 +115,7 @@ class EpisodicMemory(nn.Module):
         z = z.view(-1, 4 * embedding_size)
 
         G = F.tanh(self.z1(z))
+        G = F.sigmoid(self.z1_(G))
         G = self.z2(G)
         G = G.view(batch_num, -1)
         G = F.softmax(G, dim=-1)
